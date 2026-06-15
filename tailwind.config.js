@@ -5,6 +5,7 @@ export default {
     extend: {
       colors: {
         bg: '#080c10',
+        text: '#c9d4e0',
         surface: '#0e1520',
         surface2: '#141f2e',
         border: '#1e2d3d',
