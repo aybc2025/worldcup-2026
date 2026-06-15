@@ -10,14 +10,25 @@ function teamId(name) {
   return h
 }
 
-// Openfootball time is "HH:MM+TZ" — pad seconds so Date can parse it
-function toISODate(date, time) {
-  const t = time ? time.replace(/^(\d{2}:\d{2})([+-Z])/, '$1:00$2') : '12:00:00Z'
-  return `${date}T${t}`
+// Openfootball time is "HH:MM UTC±X" e.g. "20:00 UTC-5"
+// Convert to a proper UTC ISO string so slice(0,10) gives the UTC date.
+function matchToUTC(date, time) {
+  if (!time) return new Date(date + 'T12:00:00Z').toISOString()
+  const m = time.match(/^(\d{2}:\d{2})\s+UTC([+-]\d{1,2})$/)
+  if (!m) return new Date(date + 'T12:00:00Z').toISOString()
+  const [, hhmm, offsetStr] = m
+  const offset = parseInt(offsetStr, 10)
+  const sign = offset >= 0 ? '+' : '-'
+  const tz = `${sign}${String(Math.abs(offset)).padStart(2, '0')}:00`
+  try {
+    return new Date(`${date}T${hhmm}:00${tz}`).toISOString()
+  } catch {
+    return new Date(date + 'T12:00:00Z').toISOString()
+  }
 }
 
 export function normalizeMatch(m, idx) {
-  const dateStr = toISODate(m.date, m.time)
+  const dateStr = matchToUTC(m.date, m.time)
   const hasScore = Array.isArray(m.score?.ft)
 
   const homeName = typeof m.team1 === 'string' ? m.team1 : (m.team1?.name ?? 'TBD')
