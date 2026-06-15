@@ -79,7 +79,7 @@ export function normalizeMatch(m, idx) {
       fulltime: { home: homeGoals, away: awayGoals },
     },
     events,
-    _group: m.group ?? null,
+    _group: m.group ? String(m.group).replace(/^group\s*/i, '').toUpperCase() : null,
   }
 }
 
