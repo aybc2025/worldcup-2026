@@ -21,20 +21,14 @@ export default defineConfig({
         background_color: '#080c10',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
-        scope: '/',
+        start_url: '/worldcup-2026/',
+        scope: '/worldcup-2026/',
         icons: [
           {
-            src: '/icons/icon.svg',
+            src: '/worldcup-2026/icons/icon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
-            purpose: 'any'
-          },
-          {
-            src: '/icons/icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'maskable'
+            purpose: 'any maskable'
           }
         ]
       },
