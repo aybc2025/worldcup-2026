@@ -41,16 +41,32 @@ export const FLAG_URL = (code) =>
   `https://flagcdn.com/w80/${code?.toLowerCase()}.png`
 
 export const COUNTRY_CODES = {
-  'Brazil': 'br', 'France': 'fr', 'Germany': 'de', 'Argentina': 'ar',
-  'England': 'gb-eng', 'Spain': 'es', 'Portugal': 'pt', 'Netherlands': 'nl',
-  'Belgium': 'be', 'Italy': 'it', 'Croatia': 'hr', 'Uruguay': 'uy',
-  'Mexico': 'mx', 'USA': 'us', 'Canada': 'ca', 'Japan': 'jp',
-  'South Korea': 'kr', 'Morocco': 'ma', 'Senegal': 'sn', 'Ghana': 'gh',
-  'Ecuador': 'ec', 'Colombia': 'co', 'Chile': 'cl', 'Peru': 'pe',
-  'Australia': 'au', 'Iran': 'ir', 'Saudi Arabia': 'sa', 'Qatar': 'qa',
-  'Poland': 'pl', 'Switzerland': 'ch', 'Denmark': 'dk', 'Serbia': 'rs',
-  'Wales': 'gb-wls', 'Scotland': 'gb-sct', 'Austria': 'at', 'Turkey': 'tr',
-  'Ukraine': 'ua', 'Hungary': 'hu', 'Slovakia': 'sk', 'Czech Republic': 'cz',
-  'Romania': 'ro', 'Albania': 'al', 'Slovenia': 'si', 'Georgia': 'ge',
-  'New Zealand': 'nz', 'Panama': 'pa', 'Costa Rica': 'cr', 'Honduras': 'hn',
+  // WC2026 Group A
+  'Mexico': 'mx', 'South Africa': 'za', 'South Korea': 'kr', 'Czech Republic': 'cz',
+  // WC2026 Group B
+  'Canada': 'ca', 'Bosnia & Herzegovina': 'ba', 'Qatar': 'qa', 'Switzerland': 'ch',
+  // WC2026 Group C
+  'Brazil': 'br', 'Morocco': 'ma', 'Haiti': 'ht', 'Scotland': 'gb-sct',
+  // WC2026 Group D
+  'USA': 'us', 'Paraguay': 'py', 'Australia': 'au', 'Turkey': 'tr',
+  // WC2026 Group E
+  'Germany': 'de', 'Curaçao': 'cw', 'Ivory Coast': 'ci', 'Ecuador': 'ec',
+  // WC2026 Group F
+  'Netherlands': 'nl', 'Japan': 'jp', 'Sweden': 'se', 'Tunisia': 'tn',
+  // WC2026 Group G
+  'Belgium': 'be', 'Egypt': 'eg', 'Iran': 'ir', 'New Zealand': 'nz',
+  // WC2026 Group H
+  'Spain': 'es', 'Cape Verde': 'cv', 'Saudi Arabia': 'sa', 'Uruguay': 'uy',
+  // WC2026 Group I
+  'France': 'fr', 'Senegal': 'sn', 'Iraq': 'iq', 'Norway': 'no',
+  // WC2026 Group J
+  'Argentina': 'ar', 'Algeria': 'dz', 'Austria': 'at', 'Jordan': 'jo',
+  // WC2026 Group K
+  'Portugal': 'pt', 'DR Congo': 'cd', 'Uzbekistan': 'uz', 'Colombia': 'co',
+  // WC2026 Group L
+  'England': 'gb-eng', 'Croatia': 'hr', 'Ghana': 'gh', 'Panama': 'pa',
+  // Extras kept for fallback
+  'Georgia': 'ge', 'Italy': 'it', 'Poland': 'pl', 'Denmark': 'dk',
+  'Wales': 'gb-wls', 'Serbia': 'rs', 'Ukraine': 'ua', 'Chile': 'cl',
+  'Peru': 'pe', 'Costa Rica': 'cr', 'Honduras': 'hn',
 }

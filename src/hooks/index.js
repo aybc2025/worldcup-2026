@@ -89,13 +89,14 @@ export function useKnockout(allFixtures = []) {
   return { rounds }
 }
 
-// ── Teams — extracted from fixtures ──────────────────────
+// ── Teams — extracted from group stage fixtures only ──────
 
 export function useTeams() {
   const { fixtures, isLoading, isError } = useAllFixtures()
 
   const teamsMap = {}
   for (const f of fixtures) {
+    if (!f._group) continue  // knockout fixtures have TBD names like "1A", "2B"
     for (const side of ['home', 'away']) {
       const t = f.teams[side]
       if (t.id && !teamsMap[t.id]) teamsMap[t.id] = t
