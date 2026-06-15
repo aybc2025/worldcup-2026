@@ -1,25 +1,59 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { fetchGroups, fetchTeams } from '../services/apiClient'
-import { normalizeFixtures } from './useMatches'
+import { fetchTeamsData } from '../services/apiClient'
+import { useAllFixtures } from './useMatches'
 import { TTL } from '../config/constants'
+import { FLAG_URL, COUNTRY_CODES } from '../config/constants'
 
-// ── Groups / Standings ────────────────────────────────────
+// ── Groups / Standings — computed from fixtures ───────────
 
 export function useGroups() {
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['groups'],
-    queryFn: fetchGroups,
-    staleTime: TTL.STANDINGS,
-  })
+  const { fixtures, isLoading, isError, error, refetch } = useAllFixtures()
 
-  // worldcup26.ir returns array of groups directly or wrapped
-  const groups = Array.isArray(data)
-    ? data
-    : Array.isArray(data?.groups)
-    ? data.groups
-    : []
+  const groupMap = {}
+
+  for (const f of fixtures) {
+    if (!f._group) continue
+    const g = f._group
+    if (!groupMap[g]) groupMap[g] = {}
+
+    // Register both teams even if no result yet
+    for (const side of ['home', 'away']) {
+      const team = f.teams[side]
+      if (team.id && !groupMap[g][team.id]) {
+        groupMap[g][team.id] = {
+          team,
+          played: 0, w: 0, d: 0, l: 0,
+          gf: 0, ga: 0, gd: 0, points: 0,
+        }
+      }
+    }
+
+    // Apply result for completed matches only
+    const hg = f.goals.home
+    const ag = f.goals.away
+    if (hg === null || ag === null) continue
+
+    const hs = groupMap[g][f.teams.home.id]
+    const as_ = groupMap[g][f.teams.away.id]
+    hs.played++; as_.played++
+    hs.gf += hg; hs.ga += ag; hs.gd = hs.gf - hs.ga
+    as_.gf += ag; as_.ga += hg; as_.gd = as_.gf - as_.ga
+
+    if (hg > ag)      { hs.w++;  hs.points += 3; as_.l++ }
+    else if (hg < ag) { as_.w++; as_.points += 3; hs.l++ }
+    else              { hs.d++;  hs.points++;     as_.d++; as_.points++ }
+  }
+
+  const groups = Object.entries(groupMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, teams]) => ({
+      name,
+      teams: Object.values(teams).sort(
+        (a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf
+      ),
+    }))
 
   return { groups, isLoading, isError, error, refetch }
 }
@@ -42,8 +76,7 @@ export function useKnockout(allFixtures = []) {
   const rounds = {}
 
   for (const f of allFixtures) {
-    const raw = f.round || f.stage || f.league?.round || ''
-    // find matching canonical label
+    const raw = f.league?.round ?? ''
     const canonical = Object.entries(KNOCKOUT_LABELS).find(([k]) =>
       raw.toLowerCase().includes(k.toLowerCase())
     )?.[1]
@@ -56,51 +89,41 @@ export function useKnockout(allFixtures = []) {
   return { rounds }
 }
 
-// ── Teams ─────────────────────────────────────────────────
+// ── Teams — extracted from fixtures ──────────────────────
 
 export function useTeams() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['teams'],
-    queryFn: fetchTeams,
-    staleTime: TTL.SQUAD,
-  })
+  const { fixtures, isLoading, isError } = useAllFixtures()
 
-  const teams = Array.isArray(data) ? data : data?.teams ?? []
-  return { teams, isLoading, isError }
+  const teamsMap = {}
+  for (const f of fixtures) {
+    for (const side of ['home', 'away']) {
+      const t = f.teams[side]
+      if (t.id && !teamsMap[t.id]) teamsMap[t.id] = t
+    }
+  }
+
+  return { teams: Object.values(teamsMap), isLoading, isError }
 }
 
 export function useTeam(id) {
   const { teams, isLoading, isError } = useTeams()
   const team = teams.find((t) => String(t.id) === String(id)) ?? null
-
-  // players are embedded inside team object from worldcup26.ir
-  return {
-    team,
-    players: team?.players ?? team?.squad ?? [],
-    isLoading,
-    isError,
-  }
+  return { team, players: [], isLoading, isError }
 }
 
-// ── Top Scorers — derived from fixtures ───────────────────
+// ── Top Scorers — derived from fixture goal events ────────
 
 export function useTopScorers(allFixtures = []) {
   const scorerMap = {}
 
   for (const f of allFixtures) {
-    const events = f.events ?? []
-    for (const ev of events) {
-      if (ev.type !== 'Goal' && ev.detail !== 'Goal') continue
+    for (const ev of (f.events ?? [])) {
+      if (ev.type !== 'Goal') continue
       if (ev.detail === 'Own Goal') continue
-      const key = ev.player?.id || ev.player?.name
+      const key = ev.player?.name
       if (!key) continue
       if (!scorerMap[key]) {
-        scorerMap[key] = {
-          player: ev.player,
-          team: ev.team,
-          goals: 0,
-          penalties: 0,
-        }
+        scorerMap[key] = { player: ev.player, team: ev.team, goals: 0, penalties: 0 }
       }
       scorerMap[key].goals++
       if (ev.detail === 'Penalty') scorerMap[key].penalties++
