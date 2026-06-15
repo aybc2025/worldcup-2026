@@ -12,7 +12,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/*.png'],
+      includeAssets: ['icons/icon.svg'],
       manifest: {
         name: 'World Cup 2026',
         short_name: 'WC2026',
@@ -21,14 +21,25 @@ export default defineConfig({
         background_color: '#080c10',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/worldcup-2026/',
+        start_url: '/',
+        scope: '/',
         icons: [
-          { src: '/worldcup-2026/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/worldcup-2026/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          {
+            src: '/icons/icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any'
+          },
+          {
+            src: '/icons/icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'maskable'
+          }
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/flagcdn\.com\/.*/i,
@@ -39,19 +50,10 @@ export default defineConfig({
             }
           },
           {
-            urlPattern: /^https:\/\/worldcup26\.ir\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 8,
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 5 }
-            }
-          },
-          {
             urlPattern: /^https:\/\/raw\.githubusercontent\.com\/.*/i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'github-raw-cache',
+              cacheName: 'openfootball-cache',
               networkTimeoutSeconds: 8,
               expiration: { maxEntries: 5, maxAgeSeconds: 60 * 30 }
             }
