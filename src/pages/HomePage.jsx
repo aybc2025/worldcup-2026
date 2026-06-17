@@ -15,7 +15,8 @@ function getStatus(f) {
 }
 
 function getDate(f) {
-  return (f.kickoff_utc || f.date || f.fixture?.date || '').slice(0, 10)
+  const iso = f.kickoff_utc || f.date || f.fixture?.date || ''
+  return iso.slice(0, 10) // already UTC from matchToUTC — fine, IF header also uses UTC
 }
 
 export default function HomePage() {
@@ -95,9 +96,10 @@ export default function HomePage() {
               .map(([date, matches]) => (
                 <div key={date}>
                   <h2 className="text-[11px] font-semibold text-muted tracking-widest uppercase mb-2 px-1">
-                    {date === 'TBD' ? 'TBD' : new Date(date).toLocaleDateString(undefined, {
-                      weekday: 'long', month: 'long', day: 'numeric',
-                    })}
+                    {date === 'TBD' ? 'TBD' : new Date(date + 'T00:00:00Z').toLocaleDateString(undefined, {
+  weekday: 'long', month: 'long', day: 'numeric',
+  timeZone: 'UTC',
+})}
                   </h2>
                   <div className="space-y-2">
                     {matches.map((f, i) => (
