@@ -18,6 +18,7 @@ function normalise(fixture) {
       homeGoals: fixture.goals?.home,
       awayGoals: fixture.goals?.away,
       round:     fixture.league?.round,
+      localDate: fixture.fixture.localDate,
     }
   }
   return {
@@ -30,6 +31,7 @@ function normalise(fixture) {
     homeGoals: fixture.home_score ?? fixture.score_home ?? null,
     awayGoals: fixture.away_score ?? fixture.score_away ?? null,
     round:     fixture.round || fixture.stage || fixture.group_name,
+    localDate: fixture.localDate,
   }
 }
 
@@ -69,6 +71,10 @@ export function MatchCard({ fixture, animDelay = 0 }) {
   const kickoff = m.date ? new Date(m.date) : null
   const timeStr = kickoff?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) ?? ''
 
+  const dateLabel = m.localDate
+    ? new Date(m.localDate + 'T12:00:00').toLocaleDateString([], { month: 'short', day: 'numeric' })
+    : kickoff?.toLocaleDateString([], { month: 'short', day: 'numeric' }) ?? ''
+
   return (
     <motion.button
       initial={{ opacity: 0, y: 8 }}
@@ -79,9 +85,12 @@ export function MatchCard({ fixture, animDelay = 0 }) {
         isLive ? 'border-teal/30 shadow-[0_0_16px_rgba(0,206,201,0.08)]' : 'border-border'
       }`}
     >
-      {/* Round label */}
-      {m.round && (
-        <div className="px-4 pt-4 pb-0 text-xs font-medium text-muted">{m.round}</div>
+      {/* Round label + date */}
+      {(m.round || dateLabel) && (
+        <div className="px-4 pt-4 pb-0 flex items-center justify-between">
+          {m.round && <span className="text-xs font-medium text-muted">{m.round}</span>}
+          {dateLabel && <span className="text-xs font-medium text-muted">{dateLabel}</span>}
+        </div>
       )}
 
       {/* Main row: [flag name] [score] [name flag] */}
