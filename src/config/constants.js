@@ -40,6 +40,31 @@ export const POLL = {
 export const FLAG_URL = (code) =>
   `https://flagcdn.com/w80/${code?.toLowerCase()}.png`
 
+export const SQUAD_RAW_URL = (code) =>
+  `https://raw.githubusercontent.com/aybc2025/worldcup-2026/main/V3/squads/${code}.json`
+
+// Maps API team names → squad file code (e.g. "Algeria" → "ALG")
+export const SQUAD_CODE = {
+  'Algeria': 'ALG', 'Argentina': 'ARG', 'Australia': 'AUS', 'Austria': 'AUT',
+  'Belgium': 'BEL', 'Bosnia and Herzegovina': 'BIH', 'Bosnia & Herzegovina': 'BIH', 'Bosnia-Herzegovina': 'BIH',
+  'Brazil': 'BRA', 'Canada': 'CAN', 'Cape Verde': 'CPV', 'Cabo Verde': 'CPV',
+  "Côte d'Ivoire": 'CIV', "Cote d'Ivoire": 'CIV', 'Ivory Coast': 'CIV',
+  'Congo DR': 'COD', 'DR Congo': 'COD', 'Democratic Republic of Congo': 'COD',
+  'Colombia': 'COL', 'Croatia': 'CRO', 'Curaçao': 'CUW', 'Curacao': 'CUW',
+  'Czech Republic': 'CZE', 'Czechia': 'CZE',
+  'Ecuador': 'ECU', 'Egypt': 'EGY', 'England': 'ENG', 'Spain': 'ESP',
+  'France': 'FRA', 'Germany': 'GER', 'Ghana': 'GHA', 'Haiti': 'HTI',
+  'Iran': 'IRN', 'IR Iran': 'IRN', 'Iraq': 'IRQ', 'Jordan': 'JOR',
+  'Japan': 'JPN', 'Korea Republic': 'KOR', 'South Korea': 'KOR',
+  'Saudi Arabia': 'KSA', 'Morocco': 'MAR', 'Mexico': 'MEX',
+  'Netherlands': 'NED', 'Holland': 'NED', 'Norway': 'NOR', 'New Zealand': 'NZL',
+  'Panama': 'PAN', 'Paraguay': 'PAR', 'Portugal': 'POR', 'Qatar': 'QAT',
+  'Scotland': 'SCO', 'Senegal': 'SEN', 'Switzerland': 'SUI', 'Sweden': 'SWE',
+  'Tunisia': 'TUN', 'Turkey': 'TUR', 'Türkiye': 'TUR',
+  'Uruguay': 'URU', 'United States': 'USA', 'USA': 'USA', 'Uzbekistan': 'UZB',
+  'South Africa': 'ZAF',
+}
+
 export const COUNTRY_CODES = {
   // WC2026 Group A
   'Mexico': 'mx', 'South Africa': 'za', 'South Korea': 'kr', 'Czech Republic': 'cz',

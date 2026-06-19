@@ -5,8 +5,9 @@ import { useTeam, useFavoriteTeams } from '../hooks/index'
 import { LoadingSpinner, ErrorState, EmptyState } from '../components/common/index'
 import { FLAG_URL, COUNTRY_CODES } from '../config/constants'
 
-const POS_ORDER = ['Goalkeeper', 'Defender', 'Midfielder', 'Attacker', 'Forward']
-const POS_ICON = { Goalkeeper: '🧤', Defender: '🛡️', Midfielder: '⚙️', Attacker: '⚽', Forward: '⚽' }
+const POS_ORDER = ['GK', 'DF', 'MF', 'FW']
+const POS_LABEL = { GK: 'Goalkeepers', DF: 'Defenders', MF: 'Midfielders', FW: 'Forwards' }
+const POS_ICON = { GK: '🧤', DF: '🛡️', MF: '⚙️', FW: '⚽' }
 
 export default function TeamDetailPage() {
   const { id } = useParams()
@@ -25,7 +26,7 @@ export default function TeamDetailPage() {
   // Group by position
   const byPos = {}
   for (const p of players) {
-    const pos = p.position || p.pos || 'Squad'
+    const pos = p.pos || p.position || 'Squad'
     if (!byPos[pos]) byPos[pos] = []
     byPos[pos].push(p)
   }
@@ -73,7 +74,7 @@ export default function TeamDetailPage() {
                   <div key={pos}>
                     <div className="flex items-center gap-2 mb-2">
                       <span>{POS_ICON[pos] ?? '👤'}</span>
-                      <span className="text-[11px] font-semibold text-muted uppercase tracking-wider">{pos}</span>
+                      <span className="text-[11px] font-semibold text-muted uppercase tracking-wider">{POS_LABEL[pos] ?? pos}</span>
                     </div>
                     <div className="space-y-1.5">
                       {group.map((player, i) => (

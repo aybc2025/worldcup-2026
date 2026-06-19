@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { fetchTeamsData } from '../services/apiClient'
 import { useAllFixtures } from './useMatches'
 import { TTL } from '../config/constants'
-import { FLAG_URL, COUNTRY_CODES } from '../config/constants'
+import { FLAG_URL, COUNTRY_CODES, SQUAD_CODE, SQUAD_RAW_URL } from '../config/constants'
 
 // ── Groups / Standings — computed from fixtures ───────────
 
@@ -107,9 +107,27 @@ export function useTeams() {
 }
 
 export function useTeam(id) {
-  const { teams, isLoading, isError } = useTeams()
+  const { teams, isLoading: teamsLoading, isError: teamsError } = useTeams()
   const team = teams.find((t) => String(t.id) === String(id)) ?? null
-  return { team, players: [], isLoading, isError }
+  const code = team ? SQUAD_CODE[team.name] : null
+
+  const { data: squadData, isLoading: squadLoading } = useQuery({
+    queryKey: ['squad', code],
+    queryFn: async () => {
+      const res = await fetch(SQUAD_RAW_URL(code))
+      if (!res.ok) throw new Error('squad fetch failed')
+      return res.json()
+    },
+    enabled: !!code,
+    staleTime: TTL.SQUAD,
+  })
+
+  return {
+    team,
+    players: squadData?.squad ?? [],
+    isLoading: teamsLoading || (!!code && squadLoading),
+    isError: teamsError,
+  }
 }
 
 // ── Top Scorers — derived from fixture goal events ────────
