@@ -69,16 +69,16 @@ export default function HomePage() {
         </motion.div>
       )}
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar">
+      {/* Filter tabs — full-width grid */}
+      <div className="grid grid-cols-4 gap-2 px-3 py-3">
         {FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
+            className={`py-3 rounded-xl text-sm font-semibold transition-all ${
               filter === f
                 ? 'bg-teal/20 text-teal border border-teal/40'
-                : 'bg-surface text-muted border border-border hover:border-teal/20'
+                : 'bg-surface text-muted border border-border'
             }`}
           >
             {t(`home.${f}`)}

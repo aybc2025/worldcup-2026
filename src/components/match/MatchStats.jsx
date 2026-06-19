@@ -9,13 +9,13 @@ function StatBar({ label, home, away }) {
   const awayPct = 100 - homePct
 
   return (
-    <div className="py-2.5">
-      <div className="flex justify-between text-xs text-muted mb-1.5">
-        <span className="font-semibold text-text">{home ?? '0'}</span>
-        <span className="text-[11px]">{label}</span>
-        <span className="font-semibold text-text">{away ?? '0'}</span>
+    <div className="py-4">
+      <div className="flex justify-between items-baseline mb-2">
+        <span className="text-base font-bold text-text w-10">{home ?? '0'}</span>
+        <span className="text-xs text-muted tracking-wide uppercase text-center flex-1">{label}</span>
+        <span className="text-base font-bold text-text w-10 text-end">{away ?? '0'}</span>
       </div>
-      <div className="flex h-1 rounded-full overflow-hidden bg-border gap-px">
+      <div className="flex h-1.5 rounded-full overflow-hidden bg-border gap-px">
         <motion.div
           className="bg-teal rounded-full"
           initial={{ width: 0 }}
@@ -35,12 +35,12 @@ function StatBar({ label, home, away }) {
 
 const STAT_KEYS = [
   { api: 'Ball Possession', i18nKey: 'match.possession' },
-  { api: 'Total Shots', i18nKey: 'match.shots' },
-  { api: 'Shots on Goal', i18nKey: 'match.shotsOnTarget' },
-  { api: 'Corner Kicks', i18nKey: 'match.corners' },
-  { api: 'Fouls', i18nKey: 'match.fouls' },
-  { api: 'Yellow Cards', i18nKey: 'match.yellowCards' },
-  { api: 'Red Cards', i18nKey: 'match.redCards' },
+  { api: 'Total Shots',     i18nKey: 'match.shots' },
+  { api: 'Shots on Goal',   i18nKey: 'match.shotsOnTarget' },
+  { api: 'Corner Kicks',    i18nKey: 'match.corners' },
+  { api: 'Fouls',           i18nKey: 'match.fouls' },
+  { api: 'Yellow Cards',    i18nKey: 'match.yellowCards' },
+  { api: 'Red Cards',       i18nKey: 'match.redCards' },
 ]
 
 export function MatchStats({ stats }) {

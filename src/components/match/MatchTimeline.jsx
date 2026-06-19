@@ -6,13 +6,13 @@ const EVENT_ICONS = {
   'Own Goal': '🥅',
   Penalty: '🎯',
   'Missed Penalty': '❌',
-  Card: null, // handled by detail
+  Card: null,
   subst: '🔄',
 }
 
 function CardIcon({ detail }) {
-  if (detail?.includes('Yellow')) return <span className="text-amber text-base">🟨</span>
-  if (detail?.includes('Red')) return <span className="text-red text-base">🟥</span>
+  if (detail?.includes('Yellow')) return <span className="text-amber text-xl">🟨</span>
+  if (detail?.includes('Red'))    return <span className="text-red text-xl">🟥</span>
   return <span>📋</span>
 }
 
@@ -22,7 +22,7 @@ function EventRow({ event, isHome, index }) {
 
   const icon = type === 'Card'
     ? <CardIcon detail={detail} />
-    : <span className="text-base">{EVENT_ICONS[type] ?? EVENT_ICONS[detail] ?? '•'}</span>
+    : <span className="text-xl">{EVENT_ICONS[type] ?? EVENT_ICONS[detail] ?? '•'}</span>
 
   const label = type === 'subst'
     ? `${player?.name} → ${assist?.name}`
@@ -32,10 +32,8 @@ function EventRow({ event, isHome, index }) {
     ? `(${t('match.penalty')})`
     : type === 'Goal' && detail === 'Own Goal'
     ? `(${t('match.ownGoal')})`
-    : type === 'subst'
-    ? null
-    : assist?.name
-    ? `↳ ${assist.name}`
+    : type === 'subst' ? null
+    : assist?.name ? `↳ ${assist.name}`
     : null
 
   return (
@@ -43,20 +41,17 @@ function EventRow({ event, isHome, index }) {
       initial={{ opacity: 0, x: isHome ? -10 : 10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.04 }}
-      className={`flex items-start gap-3 py-2 ${isHome ? 'flex-row' : 'flex-row-reverse'}`}
+      className={`flex items-center gap-3 py-4 ${isHome ? 'flex-row' : 'flex-row-reverse'}`}
     >
-      {/* Time */}
-      <span className="text-[11px] text-muted min-w-[32px] text-center pt-0.5 font-mono">
+      <span className="text-sm text-muted min-w-[36px] text-center font-mono font-medium">
         {time?.elapsed}'
       </span>
 
-      {/* Icon */}
-      <div className="mt-0.5">{icon}</div>
+      <div className="flex-shrink-0">{icon}</div>
 
-      {/* Text */}
-      <div className={`flex flex-col ${isHome ? 'text-start' : 'text-end'} flex-1`}>
-        <span className="text-sm font-medium leading-tight">{label}</span>
-        {sublabel && <span className="text-[11px] text-muted">{sublabel}</span>}
+      <div className={`flex flex-col ${isHome ? 'text-start' : 'text-end'} flex-1 min-w-0`}>
+        <span className="text-base font-semibold leading-tight">{label}</span>
+        {sublabel && <span className="text-sm text-muted mt-0.5">{sublabel}</span>}
       </div>
     </motion.div>
   )
@@ -66,7 +61,7 @@ export function MatchTimeline({ events, homeTeamId }) {
   const { t } = useTranslation()
 
   if (!events?.length) {
-    return <p className="text-center text-muted text-sm py-8">{t('match.noEvents')}</p>
+    return <p className="text-center text-muted text-base py-12">{t('match.noEvents')}</p>
   }
 
   return (

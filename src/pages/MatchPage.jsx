@@ -21,22 +21,22 @@ function LineupGrid({ lineups }) {
         const subs = side.substitutes || side.bench || []
         return (
           <div key={i}>
-            <p className="text-[11px] font-bold text-teal text-center mb-3 tracking-widest uppercase">{teamName}</p>
-            <div className="space-y-1.5">
+            <p className="text-xs font-bold text-teal text-center mb-3 tracking-widest uppercase">{teamName}</p>
+            <div className="space-y-2">
               {starters.map(({ player }, j) => (
-                <div key={j} className="flex items-center gap-2 text-xs">
-                  <span className="w-5 text-center text-muted font-mono text-[11px]">{player?.number ?? j + 1}</span>
-                  <span className="truncate">{player?.name ?? player}</span>
+                <div key={j} className="flex items-center gap-2 text-sm">
+                  <span className="w-6 text-center text-muted font-mono text-xs flex-shrink-0">{player?.number ?? j + 1}</span>
+                  <span className="leading-tight">{player?.name ?? player}</span>
                 </div>
               ))}
             </div>
             {subs.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-border">
-                <p className="text-[10px] text-muted mb-1.5">Subs</p>
+              <div className="mt-4 pt-3 border-t border-border">
+                <p className="text-xs text-muted mb-2">Subs</p>
                 {subs.map(({ player }, j) => (
-                  <div key={j} className="flex items-center gap-2 text-xs text-muted">
-                    <span className="w-5 text-center font-mono text-[11px]">{player?.number}</span>
-                    <span className="truncate">{player?.name ?? player}</span>
+                  <div key={j} className="flex items-center gap-2 text-sm text-muted mb-1.5">
+                    <span className="w-6 text-center font-mono text-xs flex-shrink-0">{player?.number}</span>
+                    <span className="leading-tight">{player?.name ?? player}</span>
                   </div>
                 ))}
               </div>
@@ -66,59 +66,72 @@ export default function MatchPage() {
   const timeStr = kickoff?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) ?? ''
 
   return (
-    <div className="pb-24">
-      <button onClick={() => navigate(-1)}
-        className="flex items-center gap-2 px-4 py-3 text-muted hover:text-teal text-sm transition-colors">
+    <div className="pb-28">
+      {/* Back button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 w-full px-4 py-4 text-muted hover:text-teal text-base font-medium transition-colors"
+      >
         ← {league?.round}
       </button>
 
-      {/* Hero */}
-      <div className={`mx-4 rounded-2xl border overflow-hidden mb-4 ${
+      {/* Hero — full bleed with 2px side margin */}
+      <div className={`mx-2 rounded-2xl border overflow-hidden mb-4 ${
         isLive ? 'border-teal/30 shadow-[0_0_24px_rgba(0,206,201,0.1)]' : 'border-border'
       }`}>
-        <div className="bg-surface2 px-4 py-6">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex flex-col items-center gap-2 flex-1">
-              {homeCC && <img src={FLAG_URL(homeCC)} alt={teams?.home?.name} className="w-14 h-10 object-cover rounded" />}
-              <span className="text-sm font-bold text-center leading-tight">{teams?.home?.name}</span>
+        <div className="bg-surface2 px-4 py-8">
+          <div className="flex items-center justify-between gap-3">
+
+            <div className="flex flex-col items-center gap-3 flex-1">
+              {homeCC && <img src={FLAG_URL(homeCC)} alt={teams?.home?.name} className="w-16 h-11 object-cover rounded-md" />}
+              <span className="text-base font-bold text-center leading-snug">{teams?.home?.name}</span>
             </div>
 
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-3">
-                <span className="font-display text-5xl font-bold text-text">{goals?.home ?? '–'}</span>
-                <span className="text-muted text-2xl">–</span>
-                <span className="font-display text-5xl font-bold text-text">{goals?.away ?? '–'}</span>
+                <span className={`font-display text-6xl font-bold leading-none ${isLive ? 'text-teal' : 'text-text'}`}>
+                  {goals?.home ?? '–'}
+                </span>
+                <span className="text-muted text-3xl">–</span>
+                <span className={`font-display text-6xl font-bold leading-none ${isLive ? 'text-teal' : 'text-text'}`}>
+                  {goals?.away ?? '–'}
+                </span>
               </div>
               {isLive
                 ? <LiveScoreBadge elapsed={fix?.status?.elapsed} status={status} />
-                : <span className="text-xs text-muted">{status === 'FT' ? t('match.fulltime') : timeStr}</span>
+                : <span className="text-sm text-muted">{status === 'FT' ? t('match.fulltime') : timeStr}</span>
               }
             </div>
 
-            <div className="flex flex-col items-center gap-2 flex-1">
-              {awayCC && <img src={FLAG_URL(awayCC)} alt={teams?.away?.name} className="w-14 h-10 object-cover rounded" />}
-              <span className="text-sm font-bold text-center leading-tight">{teams?.away?.name}</span>
+            <div className="flex flex-col items-center gap-3 flex-1">
+              {awayCC && <img src={FLAG_URL(awayCC)} alt={teams?.away?.name} className="w-16 h-11 object-cover rounded-md" />}
+              <span className="text-base font-bold text-center leading-snug">{teams?.away?.name}</span>
             </div>
           </div>
         </div>
-        <div className="px-4 py-2 border-t border-border text-center text-[11px] text-muted">
-          {fix?.venue?.name}{fix?.venue?.city ? ` · ${fix.venue.city}` : ''}
-        </div>
+        {(fix?.venue?.name) && (
+          <div className="px-4 py-2.5 border-t border-border text-center text-xs text-muted">
+            {fix.venue.name}{fix.venue.city ? ` · ${fix.venue.city}` : ''}
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
-      <div className="flex mx-4 border border-border rounded-xl overflow-hidden mb-4">
+      <div className="flex mx-2 border border-border rounded-xl overflow-hidden mb-5">
         {TABS.map((tb) => (
-          <button key={tb} onClick={() => setTab(tb)}
-            className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
+          <button
+            key={tb}
+            onClick={() => setTab(tb)}
+            className={`flex-1 py-4 text-sm font-semibold transition-colors ${
               tab === tb ? 'bg-teal/15 text-teal' : 'text-muted hover:text-text'
-            }`}>
+            }`}
+          >
             {t(`match.${tb}`)}
           </button>
         ))}
       </div>
 
-      <div className="mx-4">
+      <div className="mx-3">
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}

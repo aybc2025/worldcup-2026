@@ -90,7 +90,7 @@ export function MatchCard({ fixture, animDelay = 0 }) {
         {/* Home */}
         <div className="flex items-center gap-2.5 min-w-0">
           <TeamFlag name={m.homeName} />
-          <span className="text-base font-semibold leading-tight truncate">{m.homeName}</span>
+          <span className="text-base font-semibold leading-tight line-clamp-2">{m.homeName}</span>
         </div>
 
         {/* Score / time */}
@@ -121,7 +121,7 @@ export function MatchCard({ fixture, animDelay = 0 }) {
 
         {/* Away */}
         <div className="flex items-center gap-2.5 justify-end min-w-0">
-          <span className="text-base font-semibold leading-tight truncate text-end">{m.awayName}</span>
+          <span className="text-base font-semibold leading-tight line-clamp-2 text-end">{m.awayName}</span>
           <TeamFlag name={m.awayName} />
         </div>
 
