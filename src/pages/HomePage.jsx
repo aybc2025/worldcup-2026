@@ -70,12 +70,12 @@ export default function HomePage() {
       )}
 
       {/* Filter tabs */}
-      <div className="flex gap-1 px-4 py-3 overflow-x-auto">
+      <div className="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar">
         {FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+            className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
               filter === f
                 ? 'bg-teal/20 text-teal border border-teal/40'
                 : 'bg-surface text-muted border border-border hover:border-teal/20'
@@ -96,7 +96,7 @@ export default function HomePage() {
               .sort(([a], [b]) => a.localeCompare(b))
               .map(([date, matches]) => (
                 <div key={date}>
-                  <h2 className="text-[11px] font-semibold text-muted tracking-widest uppercase mb-2 px-1">
+                  <h2 className="text-xs font-semibold text-muted tracking-widest uppercase mb-3 px-1">
                     {date === 'TBD' ? 'TBD' : new Date(date + 'T00:00:00Z').toLocaleDateString(undefined, {
   weekday: 'long', month: 'long', day: 'numeric',
   timeZone: 'UTC',

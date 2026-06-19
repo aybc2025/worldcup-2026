@@ -36,6 +36,10 @@
   }
 }
 
+/* Hide scrollbar on filter pill row */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* RTL-specific overrides */
 [dir="rtl"] .ltr-only { direction: ltr; }
 [dir="ltr"] .rtl-only { direction: rtl; }
