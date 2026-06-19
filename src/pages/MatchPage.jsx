@@ -66,6 +66,9 @@ export default function MatchPage() {
   const awayCC = COUNTRY_CODES[teams?.away?.name]
   const kickoff = fix?.date ? new Date(fix.date) : null
   const timeStr = kickoff?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) ?? ''
+  const dateStr = fix?.localDate
+    ? new Date(fix.localDate + 'T12:00:00').toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+    : kickoff?.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) ?? ''
 
   return (
     <div className="pb-32">
@@ -73,9 +76,10 @@ export default function MatchPage() {
       {/* Back button — big tap target */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 w-full px-4 py-5 text-muted hover:text-teal text-lg font-semibold transition-colors"
+        className="flex items-center justify-between w-full px-4 py-5 text-muted hover:text-teal text-lg font-semibold transition-colors"
       >
-        ← {league?.round}
+        <span>← {league?.round}</span>
+        {dateStr && <span className="text-base font-medium">{dateStr}</span>}
       </button>
 
       {/* Hero */}
