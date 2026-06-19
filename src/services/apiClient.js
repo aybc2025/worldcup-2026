@@ -40,6 +40,11 @@ const MATCH_FILES = {
   'Uzbekistan|Colombia':           'wc2026-group-k-uzbekistan-colombia',
   'England|Croatia':               'wc2026-group-l-england-croatia',
   'Ghana|Panama':                  'wc2026-group-l-ghana-panama',
+  // Matchday 4 — June 18
+  'Czech Republic|South Africa':   'wc2026-group-a-czechia-south-africa',
+  'Switzerland|Bosnia & Herzegovina': 'wc2026-group-b-switzerland-bosnia-and-herzegovina',
+  'Canada|Qatar':                  'wc2026-group-b-canada-qatar',
+  'Mexico|South Korea':            'wc2026-group-a-mexico-korea-republic',
 }
 
 // All 104 fixtures with scores and goal events
