@@ -9,13 +9,13 @@ function StatBar({ label, home, away }) {
   const awayPct = 100 - homePct
 
   return (
-    <div className="py-4">
-      <div className="flex justify-between items-baseline mb-2">
-        <span className="text-base font-bold text-text w-10">{home ?? '0'}</span>
-        <span className="text-xs text-muted tracking-wide uppercase text-center flex-1">{label}</span>
-        <span className="text-base font-bold text-text w-10 text-end">{away ?? '0'}</span>
+    <div className="py-6">
+      <div className="flex justify-between items-baseline mb-3">
+        <span className="text-2xl font-bold text-text w-12">{home ?? '0'}</span>
+        <span className="text-sm text-muted tracking-wide uppercase text-center flex-1">{label}</span>
+        <span className="text-2xl font-bold text-text w-12 text-end">{away ?? '0'}</span>
       </div>
-      <div className="flex h-1.5 rounded-full overflow-hidden bg-border gap-px">
+      <div className="flex h-2.5 rounded-full overflow-hidden bg-border gap-px">
         <motion.div
           className="bg-teal rounded-full"
           initial={{ width: 0 }}

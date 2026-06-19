@@ -36,7 +36,7 @@ function AppShell() {
       <AnimatePresence>
         {!online && <OfflineBanner key="offline" />}
       </AnimatePresence>
-      <main className="max-w-lg mx-auto pb-28">
+      <main className="max-w-lg mx-auto pb-36">
         <Suspense fallback={<LoadingSpinner size="lg" />}>
           <Routes>
             <Route path="/"           element={<HomePage />} />

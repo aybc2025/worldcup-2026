@@ -11,8 +11,8 @@ const EVENT_ICONS = {
 }
 
 function CardIcon({ detail }) {
-  if (detail?.includes('Yellow')) return <span className="text-amber text-xl">🟨</span>
-  if (detail?.includes('Red'))    return <span className="text-red text-xl">🟥</span>
+  if (detail?.includes('Yellow')) return <span className="text-2xl">🟨</span>
+  if (detail?.includes('Red'))    return <span className="text-2xl">🟥</span>
   return <span>📋</span>
 }
 
@@ -22,7 +22,7 @@ function EventRow({ event, isHome, index }) {
 
   const icon = type === 'Card'
     ? <CardIcon detail={detail} />
-    : <span className="text-xl">{EVENT_ICONS[type] ?? EVENT_ICONS[detail] ?? '•'}</span>
+    : <span className="text-2xl">{EVENT_ICONS[type] ?? EVENT_ICONS[detail] ?? '•'}</span>
 
   const label = type === 'subst'
     ? `${player?.name} → ${assist?.name}`
@@ -38,20 +38,20 @@ function EventRow({ event, isHome, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: isHome ? -10 : 10 }}
+      initial={{ opacity: 0, x: isHome ? -12 : 12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.04 }}
-      className={`flex items-center gap-3 py-4 ${isHome ? 'flex-row' : 'flex-row-reverse'}`}
+      className={`flex items-center gap-4 py-6 ${isHome ? 'flex-row' : 'flex-row-reverse'}`}
     >
-      <span className="text-sm text-muted min-w-[36px] text-center font-mono font-medium">
+      <span className="text-base text-muted min-w-[42px] text-center font-mono font-bold">
         {time?.elapsed}'
       </span>
 
       <div className="flex-shrink-0">{icon}</div>
 
       <div className={`flex flex-col ${isHome ? 'text-start' : 'text-end'} flex-1 min-w-0`}>
-        <span className="text-base font-semibold leading-tight">{label}</span>
-        {sublabel && <span className="text-sm text-muted mt-0.5">{sublabel}</span>}
+        <span className="text-lg font-bold leading-tight">{label}</span>
+        {sublabel && <span className="text-base text-muted mt-1">{sublabel}</span>}
       </div>
     </motion.div>
   )
@@ -61,7 +61,7 @@ export function MatchTimeline({ events, homeTeamId }) {
   const { t } = useTranslation()
 
   if (!events?.length) {
-    return <p className="text-center text-muted text-base py-12">{t('match.noEvents')}</p>
+    return <p className="text-center text-muted text-lg py-16">{t('match.noEvents')}</p>
   }
 
   return (

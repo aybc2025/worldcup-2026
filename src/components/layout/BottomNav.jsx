@@ -23,13 +23,13 @@ export function BottomNav() {
           to={to}
           end={to === '/'}
           className={({ isActive }) =>
-            `flex-1 flex flex-col items-center justify-center py-3 gap-1 text-center transition-colors min-h-[60px] ${
+            `flex-1 flex flex-col items-center justify-center py-4 gap-1.5 text-center transition-colors min-h-[72px] ${
               isActive ? 'text-teal' : 'text-muted hover:text-text'
             }`
           }
         >
           <span className="text-2xl leading-none">{icon}</span>
-          <span className="text-[11px] leading-tight font-medium">{t(labelKey)}</span>
+          <span className="text-xs leading-tight font-semibold">{t(labelKey)}</span>
         </NavLink>
       ))}
     </nav>

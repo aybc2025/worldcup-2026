@@ -47,7 +47,7 @@ export default function HomePage() {
   if (isError) return <ErrorState onRetry={refetch} />
 
   return (
-    <div className="pb-24">
+    <div className="pb-32">
       {/* Fallback notice */}
       {isFallback && (
         <div className="mx-4 mt-3 mb-1 text-[11px] text-amber bg-amber/10 border border-amber/20 rounded-lg px-3 py-2">
@@ -70,12 +70,12 @@ export default function HomePage() {
       )}
 
       {/* Filter tabs — full-width grid */}
-      <div className="grid grid-cols-4 gap-2 px-3 py-3">
+      <div className="grid grid-cols-4 gap-2 px-3 py-4">
         {FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`py-3 rounded-xl text-sm font-semibold transition-all ${
+            className={`py-4 rounded-xl text-sm font-bold transition-all ${
               filter === f
                 ? 'bg-teal/20 text-teal border border-teal/40'
                 : 'bg-surface text-muted border border-border'
@@ -91,18 +91,18 @@ export default function HomePage() {
         {Object.keys(grouped).length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="px-4 space-y-5">
+          <div className="px-4 space-y-6">
             {Object.entries(grouped)
               .sort(([a], [b]) => a.localeCompare(b))
               .map(([date, matches]) => (
                 <div key={date}>
-                  <h2 className="text-xs font-semibold text-muted tracking-widest uppercase mb-3 px-1">
+                  <h2 className="text-sm font-bold text-muted tracking-widest uppercase mb-3 px-1">
                     {date === 'TBD' ? 'TBD' : new Date(date + 'T00:00:00Z').toLocaleDateString(undefined, {
   weekday: 'long', month: 'long', day: 'numeric',
   timeZone: 'UTC',
 })}
                   </h2>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {matches.map((f, i) => (
                       <MatchCard
                         key={f.id || f.fixture?.id || i}

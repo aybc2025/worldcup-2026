@@ -35,13 +35,13 @@ function normalise(fixture) {
 
 function TeamFlag({ name }) {
   const cc = COUNTRY_CODES[name]
-  if (!cc) return <span className="w-9 h-6 inline-block" />
+  if (!cc) return <span className="w-12 h-8 inline-block" />
   return (
     <img
       src={FLAG_URL(cc)}
       alt={name}
       loading="lazy"
-      className="w-10 h-7 object-cover rounded flex-shrink-0"
+      className="w-12 h-8 object-cover rounded flex-shrink-0"
     />
   )
 }
@@ -81,20 +81,20 @@ export function MatchCard({ fixture, animDelay = 0 }) {
     >
       {/* Round label */}
       {m.round && (
-        <div className="px-4 pt-3 pb-0 text-[11px] text-muted">{m.round}</div>
+        <div className="px-4 pt-4 pb-0 text-xs font-medium text-muted">{m.round}</div>
       )}
 
       {/* Main row: [flag name] [score] [name flag] */}
-      <div className="grid px-4 py-3.5" style={{ gridTemplateColumns: '1fr auto 1fr', gap: '10px', alignItems: 'center' }}>
+      <div className="grid px-4 py-4" style={{ gridTemplateColumns: '1fr auto 1fr', gap: '10px', alignItems: 'center' }}>
 
         {/* Home */}
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-3 min-w-0">
           <TeamFlag name={m.homeName} />
           <span className="text-base font-semibold leading-tight line-clamp-2">{m.homeName}</span>
         </div>
 
         {/* Score / time */}
-        <div className="flex flex-col items-center gap-1 px-2">
+        <div className="flex flex-col items-center gap-1.5 px-2">
           {(isLive || isFinished) ? (
             <>
               <div className="flex items-center gap-2">
@@ -108,19 +108,19 @@ export function MatchCard({ fixture, animDelay = 0 }) {
               </div>
               {isLive
                 ? <LiveScoreBadge elapsed={m.elapsed} status={m.status} />
-                : <span className="text-[11px] text-muted">{t('match.fulltime')}</span>
+                : <span className="text-xs text-muted">{t('match.fulltime')}</span>
               }
             </>
           ) : (
             <>
               <span className="font-display text-lg font-semibold text-teal whitespace-nowrap">{timeStr}</span>
-              <span className="text-[11px] text-muted">{t('common.vs')}</span>
+              <span className="text-xs text-muted">{t('common.vs')}</span>
             </>
           )}
         </div>
 
         {/* Away */}
-        <div className="flex items-center gap-2.5 justify-end min-w-0">
+        <div className="flex items-center gap-3 justify-end min-w-0">
           <span className="text-base font-semibold leading-tight line-clamp-2 text-end">{m.awayName}</span>
           <TeamFlag name={m.awayName} />
         </div>
