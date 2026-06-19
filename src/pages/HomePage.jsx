@@ -15,8 +15,9 @@ function getStatus(f) {
 }
 
 function getDate(f) {
-  const iso = f.kickoff_utc || f.date || f.fixture?.date || ''
-  return iso.slice(0, 10) // already UTC from matchToUTC — fine, IF header also uses UTC
+  // localDate is the calendar date in the host city (YYYY-MM-DD), so late-night games
+  // (e.g. 21:00 UTC-5 on June 18) don't shift to the next UTC day.
+  return f.fixture?.localDate || f.kickoff_utc?.slice(0, 10) || f.fixture?.date?.slice(0, 10) || ''
 }
 
 export default function HomePage() {

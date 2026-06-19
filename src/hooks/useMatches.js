@@ -62,6 +62,7 @@ export function normalizeMatch(m, idx) {
     fixture: {
       id: m.num ?? idx + 1,
       date: dateStr,
+      localDate: m.date,   // YYYY-MM-DD in the host-city timezone — use for date grouping
       status: {
         short: hasScore ? 'FT' : 'NS',
         long: hasScore ? 'Match Finished' : 'Not Started',
