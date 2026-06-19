@@ -33,6 +33,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         navigateFallback: '/worldcup-2026/index.html',
         navigateFallbackDenylist: [/^\/worldcup-2026\/matches\//],
         globPatterns: ['**/*.{js,css,html,svg}'],
