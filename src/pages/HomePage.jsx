@@ -103,13 +103,15 @@ export default function HomePage() {
 })}
                   </h2>
                   <div className="space-y-3">
-                    {matches.map((f, i) => (
-                      <MatchCard
-                        key={f.id || f.fixture?.id || i}
-                        fixture={f}
-                        animDelay={i * 0.04}
-                      />
-                    ))}
+                    {[...matches]
+                      .sort((a, b) => new Date(a.fixture?.date ?? a.kickoff_utc ?? 0) - new Date(b.fixture?.date ?? b.kickoff_utc ?? 0))
+                      .map((f, i) => (
+                        <MatchCard
+                          key={f.id || f.fixture?.id || i}
+                          fixture={f}
+                          animDelay={i * 0.04}
+                        />
+                      ))}
                   </div>
                 </div>
               ))}
