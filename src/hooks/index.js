@@ -130,6 +130,20 @@ export function useTeam(id) {
   }
 }
 
+export function useTeamFixtures(teamId) {
+  const { fixtures, isLoading, isError } = useAllFixtures()
+
+  const teamFixtures = fixtures
+    .filter((f) => f.teams.home.id === teamId || f.teams.away.id === teamId)
+    .sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date))
+
+  const now = Date.now()
+  const results  = teamFixtures.filter((f) => f.fixture.status.short === 'FT' || new Date(f.fixture.date) < now)
+  const upcoming = teamFixtures.filter((f) => f.fixture.status.short !== 'FT' && new Date(f.fixture.date) >= now)
+
+  return { results, upcoming, isLoading, isError }
+}
+
 // ── Top Scorers — derived from fixture goal events ────────
 
 export function useTopScorers(allFixtures = []) {

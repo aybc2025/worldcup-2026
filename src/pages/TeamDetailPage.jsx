@@ -1,13 +1,20 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { useTeam, useFavoriteTeams } from '../hooks/index'
+import { useTeam, useTeamFixtures, useFavoriteTeams } from '../hooks/index'
 import { LoadingSpinner, ErrorState, EmptyState } from '../components/common/index'
+import { MatchCard } from '../components/match/MatchCard'
 import { FLAG_URL, COUNTRY_CODES } from '../config/constants'
 
 const POS_ORDER = ['GK', 'DF', 'MF', 'FW']
 const POS_LABEL = { GK: 'Goalkeepers', DF: 'Defenders', MF: 'Midfielders', FW: 'Forwards' }
 const POS_ICON = { GK: '🧤', DF: '🛡️', MF: '⚙️', FW: '⚽' }
+
+function SectionHeader({ label }) {
+  return (
+    <h2 className="text-xs font-bold text-muted tracking-widest uppercase mb-3">{label}</h2>
+  )
+}
 
 export default function TeamDetailPage() {
   const { id } = useParams()
@@ -16,6 +23,9 @@ export default function TeamDetailPage() {
   const { team, players, isLoading, isError } = useTeam(decodeURIComponent(id))
   const { isFavorite, toggle } = useFavoriteTeams()
 
+  const teamNumId = team?.id
+  const { results, upcoming } = useTeamFixtures(teamNumId)
+
   if (isLoading) return <LoadingSpinner size="lg" />
   if (isError || !team) return <ErrorState />
 
@@ -23,14 +33,13 @@ export default function TeamDetailPage() {
   const cc = COUNTRY_CODES[name]
   const fav = isFavorite(team.id || id)
 
-  // Group by position
+  // Group squad by position
   const byPos = {}
   for (const p of players) {
     const pos = p.pos || p.position || 'Squad'
     if (!byPos[pos]) byPos[pos] = []
     byPos[pos].push(p)
   }
-
   const posKeys = [...POS_ORDER, ...Object.keys(byPos).filter((k) => !POS_ORDER.includes(k))]
 
   return (
@@ -41,7 +50,7 @@ export default function TeamDetailPage() {
       </button>
 
       {/* Hero */}
-      <div className="mx-4 bg-surface2 border border-border rounded-2xl p-5 text-center mb-4">
+      <div className="mx-4 bg-surface2 border border-border rounded-2xl p-5 text-center mb-6">
         {cc ? (
           <img src={FLAG_URL(cc)} alt={name} className="w-20 h-14 object-cover rounded-lg mx-auto mb-3" />
         ) : (
@@ -57,15 +66,37 @@ export default function TeamDetailPage() {
         </button>
       </div>
 
+      {/* Results */}
+      {results.length > 0 && (
+        <div className="px-4 mb-6">
+          <SectionHeader label="Results" />
+          <div className="space-y-2">
+            {results.map((f, i) => (
+              <MatchCard key={f.fixture.id} fixture={f} animDelay={i * 0.04} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Upcoming */}
+      {upcoming.length > 0 && (
+        <div className="px-4 mb-6">
+          <SectionHeader label="Upcoming" />
+          <div className="space-y-2">
+            {upcoming.map((f, i) => (
+              <MatchCard key={f.fixture.id} fixture={f} animDelay={i * 0.04} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Squad */}
       <div className="px-4">
         {players.length === 0 ? (
           <EmptyState message="Squad data not yet available" />
         ) : (
           <>
-            <h2 className="text-xs font-bold text-muted tracking-widest uppercase mb-3">
-              {t('teams.squad')} — {players.length} {t('teams.players')}
-            </h2>
+            <SectionHeader label={`${t('teams.squad')} — ${players.length} ${t('teams.players')}`} />
             <div className="space-y-4">
               {posKeys.map((pos) => {
                 const group = byPos[pos]
