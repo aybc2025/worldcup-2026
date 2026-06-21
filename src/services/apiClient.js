@@ -41,10 +41,19 @@ const MATCH_FILES = {
   'England|Croatia':               'wc2026-group-l-england-croatia',
   'Ghana|Panama':                  'wc2026-group-l-ghana-panama',
   // Matchday 4 — June 18
-  'Czech Republic|South Africa':   'wc2026-group-a-czechia-south-africa',
+  'Czech Republic|South Africa':      'wc2026-group-a-czechia-south-africa',
   'Switzerland|Bosnia & Herzegovina': 'wc2026-group-b-switzerland-bosnia-and-herzegovina',
-  'Canada|Qatar':                  'wc2026-group-b-canada-qatar',
-  'Mexico|South Korea':            'wc2026-group-a-mexico-korea-republic',
+  'Canada|Qatar':                     'wc2026-group-b-canada-qatar',
+  'Mexico|South Korea':               'wc2026-group-a-mexico-korea-republic',
+  // Matchday 5 — June 19–20
+  'USA|Australia':                    'wc2026-group-d-usa-australia',
+  'Scotland|Morocco':                 'wc2026-group-c-scotland-morocco',
+  'Brazil|Haiti':                     'wc2026-group-c-brazil-haiti',
+  'Turkey|Paraguay':                  'wc2026-group-d-turkey-paraguay',
+  'Netherlands|Sweden':               'wc2026-group-f-netherlands-sweden',
+  'Germany|Ivory Coast':              'wc2026-group-e-germany-cote-divoire',
+  'Ecuador|Curaçao':                  'wc2026-group-e-ecuador-curacao',
+  'Tunisia|Japan':                    'wc2026-group-f-tunisia-japan',
 }
 
 // All 104 fixtures with scores and goal events
