@@ -54,6 +54,11 @@ const MATCH_FILES = {
   'Germany|Ivory Coast':              'wc2026-group-e-germany-cote-divoire',
   'Ecuador|Curaçao':                  'wc2026-group-e-ecuador-curacao',
   'Tunisia|Japan':                    'wc2026-group-f-tunisia-japan',
+  // Matchday 6 — June 21
+  'Spain|Saudi Arabia':              'wc2026-group-h-spain-saudi-arabia',
+  'Belgium|Iran':                    'wc2026-group-g-belgium-ir-iran',
+  'Uruguay|Cape Verde':              'wc2026-group-h-uruguay-cabo-verde',
+  'New Zealand|Egypt':               'wc2026-group-g-new-zealand-egypt',
 }
 
 // All 104 fixtures with scores and goal events
