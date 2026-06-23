@@ -59,6 +59,11 @@ const MATCH_FILES = {
   'Belgium|Iran':                    'wc2026-group-g-belgium-ir-iran',
   'Uruguay|Cape Verde':              'wc2026-group-h-uruguay-cabo-verde',
   'New Zealand|Egypt':               'wc2026-group-g-new-zealand-egypt',
+  // Matchday 7 — June 22
+  'Argentina|Austria':               'wc2026-group-j-argentina-austria',
+  'France|Iraq':                     'wc2026-group-i-france-iraq',
+  'Norway|Senegal':                  'wc2026-group-i-norway-senegal',
+  'Jordan|Algeria':                  'wc2026-group-j-jordan-algeria',
 }
 
 // All 104 fixtures with scores and goal events
