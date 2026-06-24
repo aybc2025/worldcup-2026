@@ -64,6 +64,11 @@ const MATCH_FILES = {
   'France|Iraq':                     'wc2026-group-i-france-iraq',
   'Norway|Senegal':                  'wc2026-group-i-norway-senegal',
   'Jordan|Algeria':                  'wc2026-group-j-jordan-algeria',
+  // Matchday 8 — June 23
+  'Portugal|Uzbekistan':             'wc2026-group-k-portugal-uzbekistan',
+  'England|Ghana':                   'wc2026-group-l-england-ghana',
+  'Panama|Croatia':                  'wc2026-group-l-panama-croatia',
+  'Colombia|DR Congo':               'wc2026-group-k-colombia-congo-dr',
 }
 
 // All 104 fixtures with scores and goal events
