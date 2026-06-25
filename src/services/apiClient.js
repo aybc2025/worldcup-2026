@@ -69,6 +69,13 @@ const MATCH_FILES = {
   'England|Ghana':                   'wc2026-group-l-england-ghana',
   'Panama|Croatia':                  'wc2026-group-l-panama-croatia',
   'Colombia|DR Congo':               'wc2026-group-k-colombia-congo-dr',
+  // Matchday 9 — June 24
+  'Switzerland|Canada':              'wc2026-group-b-switzerland-canada',
+  'Bosnia & Herzegovina|Qatar':      'wc2026-group-b-bosnia-and-herzegovina-qatar',
+  'Scotland|Brazil':                 'wc2026-group-c-scotland-brazil',
+  'Morocco|Haiti':                   'wc2026-group-c-morocco-haiti',
+  'Czech Republic|Mexico':           'wc2026-group-a-czechia-mexico',
+  'South Africa|South Korea':        'wc2026-group-a-south-africa-korea-republic',
 }
 
 // All 104 fixtures with scores and goal events
