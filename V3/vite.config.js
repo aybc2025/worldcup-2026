@@ -44,12 +44,20 @@ export default defineConfig({
             }
           },
           {
-            urlPattern: /^https:\/\/raw\.githubusercontent\.com\/.*/i,
+            urlPattern: /^https:\/\/raw\.githubusercontent\.com\/openfootball\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'openfootball-cache',
               networkTimeoutSeconds: 8,
               expiration: { maxEntries: 5, maxAgeSeconds: 60 * 30 }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/raw\.githubusercontent\.com\/aybc2025\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'match-detail-cache',
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 }
             }
           }
         ]
