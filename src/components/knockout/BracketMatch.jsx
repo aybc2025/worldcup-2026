@@ -5,7 +5,7 @@ import { FLAG_URL, COUNTRY_CODES } from '../../config/constants'
 
 const FINISHED = new Set(['FT', 'AET', 'PEN', 'AWD', 'WO'])
 
-function TeamRow({ team, score, isWinner, isFinished }) {
+function TeamRow({ team, score, pens, isWinner, isFinished }) {
   const cc = team ? COUNTRY_CODES[team.name] : null
   const isTbd = !team
 
@@ -30,10 +30,15 @@ function TeamRow({ team, score, isWinner, isFinished }) {
         {team?.name ?? '?'}
       </span>
 
-      <span className={`text-[11px] font-mono font-bold w-4 text-center ${
-        isWinner ? 'text-teal' : 'text-muted'
-      }`}>
-        {isFinished ? (score ?? 0) : ''}
+      <span className="flex items-baseline gap-1">
+        <span className={`text-[11px] font-mono font-bold w-4 text-center ${
+          isWinner ? 'text-teal' : 'text-muted'
+        }`}>
+          {isFinished ? (score ?? 0) : ''}
+        </span>
+        {pens != null && (
+          <span className="text-[9px] font-mono text-muted/70">({pens})</span>
+        )}
       </span>
     </div>
   )
@@ -47,13 +52,19 @@ export function BracketMatch({ fixture, index = 0 }) {
   const isLive = fixture && ['1H', '2H', 'HT', 'ET', 'P', 'BT'].includes(
     fixture.fixture?.status?.short
   )
+  const wentToPens =
+    fixture?.score?.penalties?.home != null && fixture?.score?.penalties?.away != null
 
-  const homeWon =
-    isFinished &&
-    (fixture.goals?.home ?? 0) > (fixture.goals?.away ?? 0)
-  const awayWon =
-    isFinished &&
-    (fixture.goals?.away ?? 0) > (fixture.goals?.home ?? 0)
+  const homeWon = isFinished && (
+    wentToPens
+      ? fixture.score.penalties.home > fixture.score.penalties.away
+      : (fixture.goals?.home ?? 0) > (fixture.goals?.away ?? 0)
+  )
+  const awayWon = isFinished && (
+    wentToPens
+      ? fixture.score.penalties.away > fixture.score.penalties.home
+      : (fixture.goals?.away ?? 0) > (fixture.goals?.home ?? 0)
+  )
 
   return (
     <motion.div
@@ -83,16 +94,24 @@ export function BracketMatch({ fixture, index = 0 }) {
         </div>
       )}
 
+      {wentToPens && (
+        <div className="px-2.5 pt-1 text-center text-[8px] text-amber font-bold tracking-wide">
+          {t('knockout.penalties', 'PENS')}
+        </div>
+      )}
+
       <div className="divide-y divide-border/50">
         <TeamRow
           team={fixture?.teams?.home}
           score={fixture?.goals?.home}
+          pens={fixture?.score?.penalties?.home}
           isWinner={homeWon}
           isFinished={isFinished}
         />
         <TeamRow
           team={fixture?.teams?.away}
           score={fixture?.goals?.away}
+          pens={fixture?.score?.penalties?.away}
           isWinner={awayWon}
           isFinished={isFinished}
         />
