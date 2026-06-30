@@ -6,19 +6,29 @@ import { TTL, POLL } from '../config/constants'
 const LIVE_STATUSES = new Set(['1H', 'HT', '2H', 'ET', 'P', 'BT', 'LIVE'])
 
 // Our match JSON stores events as { minute, team (string), player (string), type, detail }.
-// MatchTimeline expects { time: { elapsed }, team: { id, name }, player: { name }, type, detail }.
+// MatchTimeline expects { time: { elapsed }, team: { id, name }, player: { name }, type, detail, assist }.
+// For substitutions, "detail" holds "out: X, in: Y" — parse it so the timeline can show
+// "Y → X" instead of "Y → " (assist was never a separate field in the data).
 function normalizeDetailEvents(events, homeId, awayId, homeName) {
   if (!events?.length) return []
-  return events.map((ev) => ({
-    time: { elapsed: ev.minute },
-    team: {
-      id: ev.team === homeName ? homeId : awayId,
-      name: ev.team,
-    },
-    player: { name: ev.player },
-    type: ev.type,
-    detail: ev.detail,
-  }))
+  return events.map((ev) => {
+    let assist = null
+    if (ev.type === 'subst' && ev.detail) {
+      const m = ev.detail.match(/out:\s*(.+?),\s*in:\s*(.+)/i)
+      if (m) assist = { name: m[1].trim() } // the player coming OFF, shown as the arrow target
+    }
+    return {
+      time: { elapsed: ev.minute },
+      team: {
+        id: ev.team === homeName ? homeId : awayId,
+        name: ev.team,
+      },
+      player: { name: ev.player },
+      assist,
+      type: ev.type,
+      detail: ev.detail,
+    }
+  })
 }
 
 // Our match JSON uses "Possession"; MatchStats expects "Ball Possession".
