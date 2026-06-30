@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+──—─────────────—──–→——──—────────—────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────import { useQuery } from '@tanstack/react-query'
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchTeamsData } from '../services/apiClient'
