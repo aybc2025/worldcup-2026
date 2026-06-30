@@ -58,7 +58,7 @@ export function useGroups() {
   return { groups, isLoading, isError, error, refetch }
 }
 
-// ── Knockout — derived from fixtures ─────────────────────
+// ── Knockout — derived from fixtures, with self-resolved winners ──
 
 const KNOCKOUT_LABELS = {
   'Round of 32': 'Round of 32',
@@ -72,10 +72,24 @@ const KNOCKOUT_LABELS = {
   'Final': 'Final',
 }
 
-// Bracket-order for each round (pairs must align with the next round's slots)
+// Which Round-of-32 fixture IDs belong in each round, in display order.
+// (Matches openfootball's `num` field for Round of 32: 73–88.)
 const BRACKET_ORDER = {
-  'Round of 32': [74, 77, 73, 75, 83, 84, 81, 82, 76, 78, 79, 80, 86, 88, 85, 87],
-  'Round of 16': [89, 90, 93, 94, 91, 92, 95, 96],
+  'Round of 32':    [73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88],
+  'Round of 16':    [89, 90, 91, 92, 93, 94, 95, 96],
+  'Quarter-finals': [97, 98, 99, 100],
+  'Semi-finals':    [101, 102],
+}
+
+// Each later-round fixture ID → the two previous-round fixture IDs that feed it
+// (per the openfootball source's team1/team2 "Wxx" placeholders).
+const FEEDS_FROM = {
+  89: [74, 77],  90: [73, 75],  91: [76, 78],  92: [79, 80],
+  93: [83, 84],  94: [81, 82],  95: [86, 88],  96: [85, 87],
+  97: [89, 90],  98: [93, 94],  99: [91, 92],  100: [95, 96],
+  101: [97, 98], 102: [99, 100],
+  103: [101, 102], // 3rd place — LOSERS of 101/102, not winners
+  104: [101, 102], // Final — winners of 101/102
 }
 
 function bracketSort(fixtures, round) {
@@ -88,8 +102,34 @@ function bracketSort(fixtures, round) {
   })
 }
 
+// True once a fixture has a decisive result (regulation, ET, or pens).
+function isDecided(f) {
+  return ['FT', 'AET', 'PEN', 'AWD', 'WO'].includes(f?.fixture?.status?.short)
+}
+
+// Resolve the winner (or loser, for the 3rd-place playoff) of a fixture by id.
+function resolveTeam(byId, fixtureId, wantLoser = false) {
+  const f = byId.get(fixtureId)
+  if (!f || !isDecided(f)) return null
+
+  const wentToPens = f.score?.penalties?.home != null && f.score?.penalties?.away != null
+  const homeScore = wentToPens ? f.score.penalties.home : (f.goals?.home ?? 0)
+  const awayScore = wentToPens ? f.score.penalties.away : (f.goals?.away ?? 0)
+  if (homeScore === awayScore) return null // shouldn't happen in a decided knockout match
+
+  const homeWon = homeScore > awayScore
+  if (wantLoser) return homeWon ? f.teams.away : f.teams.home
+  return homeWon ? f.teams.home : f.teams.away
+}
+
+// A team name counts as "still a placeholder" if it matches openfootball's Wxx/Lxx pattern.
+function isPlaceholder(name) {
+  return /^[WL]\d+$/.test(name ?? '')
+}
+
 export function useKnockout(allFixtures = []) {
   const rounds = {}
+  const byId = new Map()
 
   for (const f of allFixtures) {
     const raw = f.league?.round ?? ''
@@ -100,10 +140,31 @@ export function useKnockout(allFixtures = []) {
     if (!canonical) continue
     if (!rounds[canonical]) rounds[canonical] = []
     rounds[canonical].push(f)
+    byId.set(f.fixture.id, f)
   }
 
   for (const key of Object.keys(rounds)) {
     bracketSort(rounds[key], key)
+  }
+
+  // Patch placeholder team names using our own derived results, wherever openfootball's
+  // source hasn't caught up yet (or for rounds it doesn't model, like 3rd place).
+  for (const fixtures of Object.values(rounds)) {
+    for (const f of fixtures) {
+      const feeds = FEEDS_FROM[f.fixture.id]
+      if (!feeds) continue
+      const wantLoser = f.fixture.id === 103
+      const [feedHomeId, feedAwayId] = feeds
+
+      if (isPlaceholder(f.teams.home.name)) {
+        const resolved = resolveTeam(byId, feedHomeId, wantLoser)
+        if (resolved) f.teams.home = resolved
+      }
+      if (isPlaceholder(f.teams.away.name)) {
+        const resolved = resolveTeam(byId, feedAwayId, wantLoser)
+        if (resolved) f.teams.away = resolved
+      }
+    }
   }
 
   return { rounds }
@@ -116,7 +177,7 @@ export function useTeams() {
 
   const teamsMap = {}
   for (const f of fixtures) {
-    if (!f._group) continue  // knockout fixtures have TBD names like "1A", "2B"
+    if (!f._group) continue // knockout fixtures have TBD names like "1A", "2B"
     for (const side of ['home', 'away']) {
       const t = f.teams[side]
       if (t.id && !teamsMap[t.id]) teamsMap[t.id] = t
