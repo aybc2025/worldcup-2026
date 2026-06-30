@@ -1,4 +1,4 @@
-──—─────────────—──–→——──—────────—────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchTeamsData } from '../services/apiClient'
@@ -6,7 +6,7 @@ import { useAllFixtures } from './useMatches'
 import { TTL } from '../config/constants'
 import { FLAG_URL, COUNTRY_CODES, SQUAD_CODE, SQUAD_RAW_URL } from '../config/constants'
 
-// ── Groups / Standings — computed from fixtures ───────────
+// Groups / Standings - computed from fixtures
 
 export function useGroups() {
   const { fixtures, isLoading, isError, error, refetch } = useAllFixtures()
@@ -18,7 +18,6 @@ export function useGroups() {
     const g = f._group
     if (!groupMap[g]) groupMap[g] = {}
 
-    // Register both teams even if no result yet
     for (const side of ['home', 'away']) {
       const team = f.teams[side]
       if (team.id && !groupMap[g][team.id]) {
@@ -30,7 +29,6 @@ export function useGroups() {
       }
     }
 
-    // Apply result for completed matches only
     const hg = f.goals.home
     const ag = f.goals.away
     if (hg === null || ag === null) continue
@@ -58,7 +56,7 @@ export function useGroups() {
   return { groups, isLoading, isError, error, refetch }
 }
 
-// ── Knockout — derived from fixtures ─────────────────────
+// Knockout - derived from fixtures, with self-resolved winners
 
 const KNOCKOUT_LABELS = {
   'Round of 32': 'Round of 32',
@@ -72,8 +70,57 @@ const KNOCKOUT_LABELS = {
   'Final': 'Final',
 }
 
+const BRACKET_ORDER = {
+  'Round of 32':    [73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88],
+  'Round of 16':    [89, 90, 91, 92, 93, 94, 95, 96],
+  'Quarter-finals': [97, 98, 99, 100],
+  'Semi-finals':    [101, 102],
+}
+
+const FEEDS_FROM = {
+  89: [74, 77],  90: [73, 75],  91: [76, 78],  92: [79, 80],
+  93: [83, 84],  94: [81, 82],  95: [86, 88],  96: [85, 87],
+  97: [89, 90],  98: [93, 94],  99: [91, 92],  100: [95, 96],
+  101: [97, 98], 102: [99, 100],
+  103: [101, 102],
+  104: [101, 102],
+}
+
+function bracketSort(fixtures, round) {
+  const order = BRACKET_ORDER[round]
+  if (!order) return fixtures.sort((a, b) => (a.fixture.id ?? 0) - (b.fixture.id ?? 0))
+  return fixtures.sort((a, b) => {
+    const ai = order.indexOf(a.fixture.id)
+    const bi = order.indexOf(b.fixture.id)
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi)
+  })
+}
+
+function isDecided(f) {
+  return ['FT', 'AET', 'PEN', 'AWD', 'WO'].includes(f?.fixture?.status?.short)
+}
+
+function resolveTeam(byId, fixtureId, wantLoser) {
+  const f = byId.get(fixtureId)
+  if (!f || !isDecided(f)) return null
+
+  const wentToPens = f.score?.penalties?.home != null && f.score?.penalties?.away != null
+  const homeScore = wentToPens ? f.score.penalties.home : (f.goals?.home ?? 0)
+  const awayScore = wentToPens ? f.score.penalties.away : (f.goals?.away ?? 0)
+  if (homeScore === awayScore) return null
+
+  const homeWon = homeScore > awayScore
+  if (wantLoser) return homeWon ? f.teams.away : f.teams.home
+  return homeWon ? f.teams.home : f.teams.away
+}
+
+function isPlaceholder(name) {
+  return /^[WL][0-9]+$/.test(name ?? '')
+}
+
 export function useKnockout(allFixtures = []) {
   const rounds = {}
+  const byId = new Map()
 
   for (const f of allFixtures) {
     const raw = f.league?.round ?? ''
@@ -84,19 +131,43 @@ export function useKnockout(allFixtures = []) {
     if (!canonical) continue
     if (!rounds[canonical]) rounds[canonical] = []
     rounds[canonical].push(f)
+    byId.set(f.fixture.id, f)
+  }
+
+  for (const key of Object.keys(rounds)) {
+    bracketSort(rounds[key], key)
+  }
+
+  for (const fixtures of Object.values(rounds)) {
+    for (const f of fixtures) {
+      const feeds = FEEDS_FROM[f.fixture.id]
+      if (!feeds) continue
+      const wantLoser = f.fixture.id === 103
+      const feedHomeId = feeds[0]
+      const feedAwayId = feeds[1]
+
+      if (isPlaceholder(f.teams.home.name)) {
+        const resolved = resolveTeam(byId, feedHomeId, wantLoser)
+        if (resolved) f.teams.home = resolved
+      }
+      if (isPlaceholder(f.teams.away.name)) {
+        const resolved = resolveTeam(byId, feedAwayId, wantLoser)
+        if (resolved) f.teams.away = resolved
+      }
+    }
   }
 
   return { rounds }
 }
 
-// ── Teams — extracted from group stage fixtures only ──────
+// Teams - extracted from group stage fixtures only
 
 export function useTeams() {
   const { fixtures, isLoading, isError } = useAllFixtures()
 
   const teamsMap = {}
   for (const f of fixtures) {
-    if (!f._group) continue  // knockout fixtures have TBD names like "1A", "2B"
+    if (!f._group) continue
     for (const side of ['home', 'away']) {
       const t = f.teams[side]
       if (t.id && !teamsMap[t.id]) teamsMap[t.id] = t
@@ -138,13 +209,13 @@ export function useTeamFixtures(teamId) {
     .sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date))
 
   const now = Date.now()
-  const results  = teamFixtures.filter((f) => f.fixture.status.short === 'FT' || new Date(f.fixture.date) < now)
+  const results = teamFixtures.filter((f) => f.fixture.status.short === 'FT' || new Date(f.fixture.date) < now)
   const upcoming = teamFixtures.filter((f) => f.fixture.status.short !== 'FT' && new Date(f.fixture.date) >= now)
 
   return { results, upcoming, isLoading, isError }
 }
 
-// ── Top Scorers — derived from fixture goal events ────────
+// Top Scorers - derived from fixture goal events
 
 export function useTopScorers(allFixtures = []) {
   const scorerMap = {}
@@ -166,7 +237,7 @@ export function useTopScorers(allFixtures = []) {
   return Object.values(scorerMap).sort((a, b) => b.goals - a.goals)
 }
 
-// ── Favourite Teams ───────────────────────────────────────
+// Favourite Teams
 
 const FAV_KEY = 'wc2026_favorites'
 
@@ -190,7 +261,7 @@ export function useFavoriteTeams() {
   return { favorites, toggle, isFavorite }
 }
 
-// ── Online Status ─────────────────────────────────────────
+// Online Status
 
 export function useOnlineStatus() {
   const [online, setOnline] = useState(navigator.onLine)
@@ -204,7 +275,7 @@ export function useOnlineStatus() {
   return online
 }
 
-// ── Language ──────────────────────────────────────────────
+// Language
 
 export function useLanguage() {
   const { i18n } = useTranslation()
