@@ -76,6 +76,29 @@ const MATCH_FILES = {
   'Morocco|Haiti':                   'wc2026-group-c-morocco-haiti',
   'Czech Republic|Mexico':           'wc2026-group-a-czechia-mexico',
   'South Africa|South Korea':        'wc2026-group-a-south-africa-korea-republic',
+  // Matchday 10 — June 25
+  'Curaçao|Ivory Coast':             'wc2026-group-e-curacao-cotedivoire',
+  'Ecuador|Germany':                 'wc2026-group-e-ecuador-germany',
+  'Japan|Sweden':                    'wc2026-group-f-japan-sweden',
+  'Tunisia|Netherlands':             'wc2026-group-f-tunisia-netherlands',
+  'Turkey|USA':                      'wc2026-group-d-turkiye-usa',
+  'Paraguay|Australia':              'wc2026-group-d-paraguay-australia',
+  // Matchday 11 — June 26
+  'Norway|France':                   'wc2026-group-i-norway-france',
+  'Senegal|Iraq':                    'wc2026-group-i-senegal-iraq',
+  'Cape Verde|Saudi Arabia':         'wc2026-group-h-caboverde-saudiarabia',
+  'Uruguay|Spain':                   'wc2026-group-h-uruguay-spain',
+  'Egypt|Iran':                      'wc2026-group-g-egypt-iran',
+  'New Zealand|Belgium':             'wc2026-group-g-newzealand-belgium',
+  // Matchday 12 — June 27
+  'Panama|England':                  'wc2026-group-l-panama-england',
+  'Croatia|Ghana':                   'wc2026-group-l-croatia-ghana',
+  'Colombia|Portugal':               'wc2026-group-k-colombia-portugal',
+  'DR Congo|Uzbekistan':             'wc2026-group-k-congodr-uzbekistan',
+  'Algeria|Austria':                 'wc2026-group-j-algeria-austria',
+  'Jordan|Argentina':                'wc2026-group-j-jordan-argentina',
+  // Round of 32 — June 28
+  'South Africa|Canada':             'wc2026-r32-southafrica-canada',
 }
 
 // All 104 fixtures with scores and goal events
