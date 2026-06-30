@@ -1,89 +1,112 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchAllFixtures, fetchMatchDetail } from '../services/apiClient'
-import { normalizeFixtures } from './useMatches'
+import { fetchAllFixtures } from '../services/apiClient'
 import { TTL, POLL } from '../config/constants'
 
-const LIVE_STATUSES = new Set(['1H', 'HT', '2H', 'ET', 'P', 'BT', 'LIVE'])
-
-// Our match JSON stores events as { minute, team (string), player (string), type, detail }.
-// MatchTimeline expects { time: { elapsed }, team: { id, name }, player: { name }, type, detail, assist }.
-// For substitutions, "detail" holds "out: X, in: Y" — parse it so the timeline can show
-// "Y → X" instead of "Y → " (assist was never a separate field in the data).
-function normalizeDetailEvents(events, homeId, awayId, homeName) {
-  if (!events?.length) return []
-  return events.map((ev) => {
-    let assist = null
-    if (ev.type === 'subst' && ev.detail) {
-      const m = ev.detail.match(/out:\s*(.+?),\s*in:\s*(.+)/i)
-      if (m) assist = { name: m[1].trim() } // the player coming OFF, shown as the arrow target
-    }
-    return {
-      time: { elapsed: ev.minute },
-      team: {
-        id: ev.team === homeName ? homeId : awayId,
-        name: ev.team,
-      },
-      player: { name: ev.player },
-      assist,
-      type: ev.type,
-      detail: ev.detail,
-    }
-  })
+// Stable numeric ID from a team name string
+function teamId(name) {
+  if (!name) return 0
+  let h = 0
+  for (const c of name) h = (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0
+  return h
 }
 
-// Our match JSON uses "Possession"; MatchStats expects "Ball Possession".
-function normalizeDetailStats(stats) {
-  if (!stats?.length) return []
-  return stats.map((side) => ({
-    ...side,
-    statistics: (side.statistics ?? []).map((s) => ({
-      ...s,
-      type: s.type === 'Possession' ? 'Ball Possession' : s.type,
+// Openfootball time is "HH:MM UTC±X" e.g. "20:00 UTC-5"
+// Convert to a proper UTC ISO string so slice(0,10) gives the UTC date.
+function matchToUTC(date, time) {
+  if (!time) return new Date(date + 'T12:00:00Z').toISOString()
+  const m = time.match(/^(\d{2}:\d{2})\s+UTC([+-]\d{1,2})$/)
+  if (!m) return new Date(date + 'T12:00:00Z').toISOString()
+  const [, hhmm, offsetStr] = m
+  const offset = parseInt(offsetStr, 10)
+  const sign = offset >= 0 ? '+' : '-'
+  const tz = `${sign}${String(Math.abs(offset)).padStart(2, '0')}:00`
+  try {
+    return new Date(`${date}T${hhmm}:00${tz}`).toISOString()
+  } catch {
+    return new Date(date + 'T12:00:00Z').toISOString()
+  }
+}
+
+export function normalizeMatch(m, idx) {
+  const dateStr = matchToUTC(m.date, m.time)
+  const hasScore = Array.isArray(m.score?.ft)
+  const hasPens = Array.isArray(m.score?.p)
+  const hasET = Array.isArray(m.score?.et)
+
+  const homeName = typeof m.team1 === 'string' ? m.team1 : (m.team1?.name ?? 'TBD')
+  const awayName = typeof m.team2 === 'string' ? m.team2 : (m.team2?.name ?? 'TBD')
+  const homeCode = typeof m.team1 === 'object' ? (m.team1?.code ?? null) : null
+  const awayCode = typeof m.team2 === 'object' ? (m.team2?.code ?? null) : null
+  const homeId = teamId(homeName)
+  const awayId = teamId(awayName)
+
+  const homeGoals = hasScore ? m.score.ft[0] : null
+  const awayGoals = hasScore ? m.score.ft[1] : null
+  const homePens = hasPens ? m.score.p[0] : null
+  const awayPens = hasPens ? m.score.p[1] : null
+
+  const events = [
+    ...(m.goals1 ?? []).map((g) => ({
+      team: { id: homeId, name: homeName },
+      player: { name: g.name },
+      minute: g.minute,
+      type: 'Goal',
+      detail: g.penalty ? 'Penalty' : g.owngoal ? 'Own Goal' : 'Normal Goal',
     })),
-  }))
+    ...(m.goals2 ?? []).map((g) => ({
+      team: { id: awayId, name: awayName },
+      player: { name: g.name },
+      minute: g.minute,
+      type: 'Goal',
+      detail: g.penalty ? 'Penalty' : g.owngoal ? 'Own Goal' : 'Normal Goal',
+    })),
+  ]
+
+  return {
+    fixture: {
+      id: m.num ?? idx + 1,
+      date: dateStr,
+      localDate: m.date,   // YYYY-MM-DD in the host-city timezone — use for date grouping
+      status: {
+        short: hasPens ? 'PEN' : hasET ? 'AET' : hasScore ? 'FT' : 'NS',
+        long: hasScore ? 'Match Finished' : 'Not Started',
+      },
+      venue: m.ground ? { name: m.ground.name, city: m.ground.city } : null,
+    },
+    league: { round: m.round ?? '' },
+    teams: {
+      home: { id: homeId, name: homeName, code: homeCode },
+      away: { id: awayId, name: awayName, code: awayCode },
+    },
+    goals: { home: homeGoals, away: awayGoals },
+    score: {
+      halftime: { home: m.score?.ht?.[0] ?? null, away: m.score?.ht?.[1] ?? null },
+      fulltime: { home: homeGoals, away: awayGoals },
+      penalties: { home: homePens, away: awayPens },
+    },
+    events,
+    _group: m.group ? String(m.group).replace(/^group\s*/i, '').toUpperCase() : null,
+  }
 }
 
-export function useMatch(id) {
-  const { data, isLoading, isError, error } = useQuery({
+// Used by useMatch.js which still calls normalizeFixtures on raw query data
+export function normalizeFixtures(data) {
+  if (!data) return []
+  const raw = Array.isArray(data.matches) ? data.matches : []
+  return raw.map(normalizeMatch)
+}
+
+export function useAllFixtures() {
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['fixtures', 'all'],
     queryFn: fetchAllFixtures,
-    staleTime: TTL.LIVE_MATCH,
-    refetchInterval: (query) => {
-      const fixtures = normalizeFixtures(query.state.data)
-      const match = fixtures.find((f) => String(f.fixture?.id) === String(id))
-      const status = match?.fixture?.status?.short
-      return LIVE_STATUSES.has(status) ? POLL.LIVE : false
-    },
+    staleTime: TTL.FIXTURES_ALL,
+    refetchInterval: POLL.IDLE,
     refetchIntervalInBackground: false,
-    enabled: !!id,
+    retry: 2,
   })
 
   const fixtures = normalizeFixtures(data)
-  const fixture = fixtures.find((f) => String(f.fixture?.id) === String(id)) ?? null
-  const isLive = LIVE_STATUSES.has(fixture?.fixture?.status?.short)
 
-  const homeName = fixture?.teams?.home?.name
-  const awayName = fixture?.teams?.away?.name
-  const homeId   = fixture?.teams?.home?.id
-  const awayId   = fixture?.teams?.away?.id
-
-  const { data: detail } = useQuery({
-    queryKey: ['match-detail', homeName, awayName],
-    queryFn: () => fetchMatchDetail(homeName, awayName),
-    staleTime: TTL.SQUAD,  // 24 h — completed match data never changes
-    enabled: !!(homeName && awayName),
-  })
-
-  return {
-    fixture,
-    isLive,
-    isLoading,
-    isError,
-    error,
-    events: detail
-      ? normalizeDetailEvents(detail.events, homeId, awayId, homeName)
-      : (fixture?.events ?? []),
-    lineups: detail?.lineups ?? [],
-    stats:   normalizeDetailStats(detail?.stats),
-  }
+  return { fixtures, isLoading, isError, error, refetch }
 }
